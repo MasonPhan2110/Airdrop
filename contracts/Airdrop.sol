@@ -13,9 +13,10 @@ contract Airdrop is OwnableUpgradeable, UUPSUpgradeable {
     uint256 constant DAY_IN_SECONDS = 86400;
     uint256 public rewardPerDay;
     address internal _nftContract;
-    mapping (address=>OwnerData) ownerData;
+    mapping (address=>OwnerData) private ownerData;
     uint256 public holder;
     uint256 public startDay;
+    uint256 public todayClaimed;
     address public tokenAddress;
     PoolInfo public poolInfo;
 
@@ -90,8 +91,8 @@ contract Airdrop is OwnableUpgradeable, UUPSUpgradeable {
        uint256 multiplier = _to.sub(_from).div(DAY_IN_SECONDS);
        return multiplier+1;
     }
-    function pendingReward(address user) internal view returns(uint256) {
-        OwnerData memory data = ownerData[user];
+    function pendingReward() public view returns(uint256) {
+        OwnerData memory data = ownerData[msg.sender];
         uint256 accRewardsPerShare = poolInfo.accRewardsPerShare;
         uint256 multiplier = getMultiplier(poolInfo.lastRewardTime, block.timestamp);
         uint256 tokenReward = rewardPerDay * multiplier;
@@ -127,5 +128,9 @@ contract Airdrop is OwnableUpgradeable, UUPSUpgradeable {
         uint256 tokenReward = rewardPerDay * multiplier;
         poolInfo.accRewardsPerShare = poolInfo.accRewardsPerShare.add(tokenReward.mul(1e18).div(supply));
         poolInfo.lastRewardTime = block.timestamp;
+    }
+
+    function getOwnerData() external view returns(OwnerData memory) {
+        return ownerData[msg.sender];
     }
 }

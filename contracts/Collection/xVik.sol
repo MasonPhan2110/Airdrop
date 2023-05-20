@@ -30,8 +30,7 @@ contract xVik is ERC721, Ownable, ReentrancyGuard {
 
 
     event Mint(address indexed to_,
-        uint256[] tokenIds,
-        uint256 totalCopies_,
+        uint256 tokenIds,
         string internalId_
     );
     
@@ -91,49 +90,36 @@ contract xVik is ERC721, Ownable, ReentrancyGuard {
 
     /**
      * @dev Handle mint request
-     * @param to_ the address to receive NFTs
      * @param internalId_ internal ID
-     * @param amount_ the amount of token minted
-     * @param scarcities_ scarcities of NFT (0: Super Rare, 1: Rare, 2: Normal)
+     * @param scarcity scarcities of NFT (0: Super Rare, 1: Rare, 2: Normal)
      * @param signature: Signature
      */
     function mint(
-        address to_,
         string memory internalId_,
-        uint256 amount_,
-        uint256[] memory scarcities_,
+        uint256 scarcity,
         bytes memory signature 
     )
         public
-        returns (uint256[] memory, uint256 totalSupply, uint256 totalMinted)
     {  
         uint256 totalAmount = 0;
 
-        uint256[] memory tokenIds = new uint256[](amount_);
-        require(scarcities_.length == amount_,"xVik: Input data invalid");
-
 
         if(msg.sender != owner()){
-            require(!signatureInvalid[signature] && verify(internalId_, to_,amount_,scarcities_, signature), "xVik: Signature is invalid");
+            require(!signatureInvalid[signature] && verify(internalId_, msg.sender,scarcity, signature), "xVik: Signature is invalid");
             signatureInvalid[signature] = true;
         }
-
-        for (uint256 i = 0; i < amount_; i++) {
-            tokenIds[i] = _handleMint(to_, scarcities_[i]);
-            if (scarcities_[i] == 0) {
-                totalAmount += 5;
-            } else if (scarcities_[i] == 1) {
-                totalAmount += 2;
-            } else {
-                totalAmount += 1;
-            }
+        uint256 tokenId = _handleMint(msg.sender, scarcity);
+        if (scarcity == 0) {
+            totalAmount += 5;
+        } else if (scarcity == 1) {
+            totalAmount += 2;
+        } else {
+            totalAmount += 1;
         }
-        airdrop.mintNFT(to_, totalAmount);
+        airdrop.mintNFT(msg.sender, totalAmount);
 
 
-        emit Mint(to_,tokenIds, totalSupply, internalId_);
-
-        return (tokenIds, totalSupply, totalMinted);
+        emit Mint(msg.sender,tokenId, internalId_);
     }
 
     /**
@@ -172,17 +158,14 @@ contract xVik is ERC721, Ownable, ReentrancyGuard {
      * @dev Return Message Hash
      * @param _internalId internal ID
      * @param _to: address of user claim NFT
-     * @param _amount: amount of NFT
-     * @param scarcities_ scarcities of NFT (0: Super Rare, 1: Rare, 2: Normal)
-     * @param _amount: amount of token
+     * @param scarcity scarcity of NFT (0: Super Rare, 1: Rare, 2: Normal)
     */
     function getMessageHash(
         string memory _internalId,
         address _to,
-        uint256 _amount,
-        uint256[] memory scarcities_
+        uint256 scarcity
     ) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked(_internalId,_to,_amount, scarcities_));
+        return keccak256(abi.encodePacked(_internalId,_to, scarcity));
     }
 
     /**
@@ -204,18 +187,16 @@ contract xVik is ERC721, Ownable, ReentrancyGuard {
      * @dev Return True/False
      * @param _internalId internal ID
      * @param _to: address of user claim NFT
-     * @param _amount: amount of NFT
-     * @param scarcities_ scarcities of NFT (0: Super Rare, 1: Rare, 2: Normal)
+     * @param scarcity_ scarcity of NFT (0: Super Rare, 1: Rare, 2: Normal)
      * @param signature: sign the message hash offchain
     */
     function verify(
         string memory _internalId,
         address _to,
-        uint256 _amount,
-        uint256[] memory scarcities_,
+        uint256 scarcity_,
         bytes memory signature
     ) internal view returns (bool) {
-        bytes32 messageHash = getMessageHash(_internalId,_to, _amount, scarcities_);
+        bytes32 messageHash = getMessageHash(_internalId,_to, scarcity_);
         bytes32 ethSignedMessageHash = getEthSignedMessageHash(messageHash);
         return recoverSigner(ethSignedMessageHash, signature) == _signer;
     }
@@ -263,5 +244,8 @@ contract xVik is ERC721, Ownable, ReentrancyGuard {
 
     function setSigner(address newSigner) external onlyOwner{
         _signer = newSigner;
+    }
+    function setAirdrop(address airdropCon) external onlyOwner {
+        airdrop = IAirdrop(airdropCon);
     }
 }
