@@ -2,10 +2,14 @@
 pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 
-contract Airdrop {
+contract Airdrop is OwnableUpgradeable, UUPSUpgradeable {
     using SafeMath for uint256;
+
+    /*================================ VARIABLES ================================*/
     uint256 constant DAY_IN_SECONDS = 86400;
     uint256 public rewardPerDay;
     address internal _nftContract;
@@ -15,6 +19,7 @@ contract Airdrop {
     address public tokenAddress;
     PoolInfo public poolInfo;
 
+    /*================================ STRUCTS ================================*/
     struct OwnerData {
         uint256 startTime;
         uint256 balance;
@@ -30,19 +35,29 @@ contract Airdrop {
         uint256 lastRewardTime;
         uint256 accRewardsPerShare;
     }
-    
+
+    /*================================ EVENTS ================================*/
     event ClaimReward (
         address indexed user,
         uint256 balance,
         uint256 amount
     );
 
-    constructor(address NFTContract, address token_) {
+    /*=============================== FUNCTIONS ===============================*/
+    ///@dev required by the OZ UUPS module
+    function _authorizeUpgrade(address) internal override onlyOwner {}
+
+    function initialize(address NFTContract, address token_) public initializer {
         _nftContract = NFTContract;
         startDay = block.timestamp;
         rewardPerDay = 1_000_000 * 10**18;
         tokenAddress = token_;
+        ///@dev as there is no constructor, we need to initialise the OwnableUpgradeable explicitly
+        __Ownable_init();
+
+        
     }
+
     function transferNFT(address from, address to, uint256 amount) external {
         require(msg.sender == _nftContract,"Only NFT contract can call");
         OwnerData storage dataFrom = ownerData[from];
