@@ -3,9 +3,10 @@ const fs = require("fs");
 require('dotenv').config();
 
 async function main() {
-    
+ let name = "Vik"
+ let symbol = "Vik"
  const Token = await ethers.getContractFactory("Vik");
- const token = await Token.deploy()
+ const token = await Token.deploy(name, symbol)
  await token.deployed();
 
  console.log("Token deployed to:", token.address);

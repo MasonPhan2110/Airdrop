@@ -1,41 +1,22 @@
-const { ethers, upgrades } = require("hardhat");
+const hre = require("hardhat");
 const fs = require("fs");
 
 async function main() {
- let file = fs.readFileSync(
-    "./scripts/data/deployNFT.json",
-    "utf8"
- );
- let data = JSON.parse(file);
-    
- if (!data || !data.NFTAddress) throw new Error("Invalid JSON data");
-    
- let NFTAddress = data.NFTAddress
+  const Airdrop = await hre.ethers.getContractFactory("Airdrop");
+  const airdrop = await Airdrop.deploy();
+  await airdrop.deployed();
 
- file = fs.readFileSync(
-    "./scripts/data/deployToken.json",
-    "utf8"
- );
- data = JSON.parse(file);
-    
- if (!data || !data.TokenAddress) throw new Error("Invalid JSON data");
- let TokenAddress = data.TokenAddress
+  console.log("airdrop deployed to:", airdrop.address);
 
- const Airdrop = await ethers.getContractFactory("Airdrop");
-
- console.log("Deploying Proxy Airdrop...");
-
- const airdrop = await upgrades.deployProxy(Airdrop,[NFTAddress,TokenAddress], {
-  initializer: "initialize",
-});
- await airdrop.deployed();
-
- console.log("Airdrop Proxy deployed to:", geomark.address);
-
- fs.writeFileSync(
+  fs.writeFileSync(
     "./scripts/data/deployAirdropProxy.json",
     JSON.stringify({ AirdropProxy: airdrop.address })
   );
 }
 
-main();
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });

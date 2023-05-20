@@ -4,7 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy::ProxyAirdrop": "npx hardhat run scripts/deploy/deployAirdropProxy.js --network",
+    "deploy::Airdrop": "npx hardhat run scripts/deploy/deployAirdrop.js --network",
+    "deploy::NFT": "npx hardhat run scripts/deploy/deployNFT.js --network",
+    "deploy::Token": "npx hardhat run scripts/deploy/deployToken.js --network",
+    "verify::Airdrop": "npx hardhat run scripts/verify/Airdrop.js --network",
+    "verify::NFT": "npx hardhat run scripts/verify/NFT.js --network",
+    "verify::Token": "npx hardhat run scripts/verify/Token.js --network"
   },
   "author": "",
   "license": "ISC",
