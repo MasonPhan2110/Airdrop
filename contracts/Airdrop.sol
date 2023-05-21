@@ -4,21 +4,27 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+import "hardhat/console.sol";
+
+
 
 
 contract Airdrop is OwnableUpgradeable, UUPSUpgradeable {
     using SafeMath for uint256;
+    using Counters for Counters.Counter;
 
     /*================================ VARIABLES ================================*/
+    Counters.Counter poolId;
     uint256 constant DAY_IN_SECONDS = 86400;
     uint256 public rewardPerDay;
     address internal _nftContract;
-    mapping (address=>OwnerData) private ownerData;
+    mapping (address => mapping(uint256 => OwnerData)) private ownerData;
+    mapping (uint256 => PoolInfo) public poolInfos;
+    mapping (uint256 => mapping(uint256 => bool)) public isClaimed;
     uint256 public holder;
     uint256 public startDay;
-    uint256 public todayClaimed;
     address public tokenAddress;
-    PoolInfo public poolInfo;
 
     /*================================ STRUCTS ================================*/
     struct OwnerData {
@@ -26,15 +32,17 @@ contract Airdrop is OwnableUpgradeable, UUPSUpgradeable {
         uint256 balance;
         uint256 rewardClaimed;
         uint256 lastClaimed;
-        uint256 rewardDebt;
+        uint256 lastUpdate;
         uint256 rewardPaid;
-        address account;
     }
 
     struct PoolInfo {
+        uint256 createTime;
         uint256 totalDeposit;
+        uint256 totalDepositForNextPool;
         uint256 lastRewardTime;
-        uint256 accRewardsPerShare;
+        uint256 rewardRemain;
+        uint256 rewardPerNFT;
     }
 
     /*================================ EVENTS ================================*/
@@ -53,84 +61,177 @@ contract Airdrop is OwnableUpgradeable, UUPSUpgradeable {
         startDay = block.timestamp;
         rewardPerDay = 1_000_000 * 10**18;
         tokenAddress = token_;
+        poolId._value = 1;
         ///@dev as there is no constructor, we need to initialise the OwnableUpgradeable explicitly
         __Ownable_init();
 
         
     }
 
-    function transferNFT(address from, address to, uint256 amount) external {
+    function transferNFT(address from, address to, uint256 tokenId, uint256 amount) external {
         require(msg.sender == _nftContract,"Only NFT contract can call");
-        OwnerData storage dataFrom = ownerData[from];
-        OwnerData storage dataTo = ownerData[to];
+        OwnerData storage dataFrom = ownerData[from][tokenId];
+        OwnerData storage dataTo = ownerData[to][tokenId];
 
-        updatePool();
-        dataFrom.rewardPaid = dataFrom.balance.mul(poolInfo.accRewardsPerShare).div(1e18).sub(dataFrom.rewardDebt).add(dataFrom.rewardPaid);
-        dataTo.rewardPaid = dataTo.balance.mul(poolInfo.accRewardsPerShare).div(1e18).sub(dataTo.rewardDebt).add(dataTo.rewardPaid);
+        updatePool(poolId.current());
+        dataFrom.rewardPaid = earn(from,tokenId);
+        dataTo.rewardPaid = earn(to,tokenId);
 
         dataTo.balance += amount;
         dataFrom.balance -= amount;
+        dataTo.lastUpdate = block.timestamp;
+        if(isClaimed[poolId.current()][tokenId]) {
+            dataFrom.lastUpdate = (block.timestamp).div(DAY_IN_SECONDS).add(1).mul(DAY_IN_SECONDS);
+        } else {
+            dataFrom.lastUpdate = block.timestamp;
+        }
         
-        dataFrom.rewardDebt =  dataFrom.balance.mul(poolInfo.accRewardsPerShare).div(1e18);
-        dataTo.rewardDebt =  dataTo.balance.mul(poolInfo.accRewardsPerShare).div(1e18);
         
     }
-    function mintNFT(address to, uint256 amount) external {
+    function mintNFT(address to,uint256 tokenId, uint256 amount) external {
         require(msg.sender == _nftContract,"Only NFT contract can call");
-        OwnerData storage data = ownerData[to];
+        OwnerData storage data = ownerData[to][tokenId];
 
-        updatePool();
-        data.rewardPaid = data.balance.mul(poolInfo.accRewardsPerShare).div(1e18).sub(data.rewardDebt).add(data.rewardPaid);
+        updatePool(poolId.current());
+        data.rewardPaid = earn(to, tokenId);
 
         data.balance += amount;
-        poolInfo.totalDeposit += amount;
+        data.lastUpdate = block.timestamp;
+        PoolInfo storage pool = poolInfos[poolId.current()];
+        pool.totalDeposit += amount;
+        pool.totalDepositForNextPool += amount;
+        pool.rewardPerNFT = rewardPerDay.div(pool.totalDeposit);
 
-        data.rewardDebt =  data.balance.mul(poolInfo.accRewardsPerShare).div(1e18);
     }
     function getMultiplier(uint256 _from, uint256 _to) public pure returns (uint256) {
-       uint256 multiplier = _to.sub(_from).div(DAY_IN_SECONDS);
-       return multiplier+1;
+       uint256 multiplier = (_to.div(DAY_IN_SECONDS)).sub(_from.div(DAY_IN_SECONDS));
+       return multiplier;
     }
-    function pendingReward() public view returns(uint256) {
-        OwnerData memory data = ownerData[msg.sender];
-        uint256 accRewardsPerShare = poolInfo.accRewardsPerShare;
-        uint256 multiplier = getMultiplier(poolInfo.lastRewardTime, block.timestamp);
-        uint256 tokenReward = rewardPerDay * multiplier;
-        accRewardsPerShare = accRewardsPerShare.add(tokenReward.mul(1e18).div(poolInfo.totalDeposit));
-        return data.balance.mul(accRewardsPerShare).div(1e18).sub(data.rewardDebt);
+    function pendingReward(uint256 tokenId) public view returns(uint256) {
+        if (isClaimed[poolId.current()][tokenId]) {
+            return 0;
+        }
+        return earn(msg.sender, tokenId);
     }
-    function claimAirdrop() external {
-        OwnerData storage data = ownerData[msg.sender];
-        require(block.timestamp/DAY_IN_SECONDS - data.lastClaimed/DAY_IN_SECONDS >=1, "You already Claimed");
+    function earn(address user, uint256 tokenId) internal view returns(uint256) {
+        OwnerData memory data = ownerData[user][tokenId];
+        uint256 multiplier;
+        if (data.lastUpdate > 0) {
+            multiplier = getMultiplier(data.lastUpdate, block.timestamp);
+        }
+        uint256 reward = 0;
+        if (multiplier > 0) {
+            for(uint256 i = poolId.current();i>poolId.current()-multiplier;i--){
+                reward += poolInfos[i].rewardPerNFT * data.balance;
+            }
+        } else {
+            reward = poolInfos[poolId.current()].rewardPerNFT * data.balance;
+        }
+        reward += data.rewardPaid;
+        return reward;
 
-        updatePool();
-        uint256 reward = data.balance.mul(poolInfo.accRewardsPerShare).div(1e18).sub(data.rewardDebt).add(data.rewardPaid);
+    }
+    function claimAirdrop(uint256 tokenId) external {
+        OwnerData storage data = ownerData[msg.sender][tokenId];
+        PoolInfo storage pool = poolInfos[poolId.current()];
+        uint256 time = block.timestamp/DAY_IN_SECONDS - data.lastClaimed/DAY_IN_SECONDS;
+        console.log("time", time);
+        require(time >=1, "You already Claimed");
+
+        updatePool(poolId.current());
+        require(!isClaimed[poolId.current()][tokenId],"This token already claimed airdrop");
+        uint256 reward = earn(msg.sender, tokenId);
+        if (pool.rewardRemain == 0 && time == 1) {
+            reward = 0;
+        }
         if(reward > 0) {
             uint256 bal = IERC20(tokenAddress).balanceOf(address(this));
             require(bal>=reward,"InsufficentFund");
+            isClaimed[poolId.current()][tokenId] = true;
+            data.rewardClaimed += reward;
+            data.rewardPaid = 0;
+            data.lastClaimed = block.timestamp;
+            data.lastUpdate = block.timestamp;
+            emit ClaimReward(msg.sender, data.balance, reward);
         }
 
-        data.rewardClaimed += reward;
-        data.rewardPaid = 0;
-
-        emit ClaimReward(msg.sender, data.balance, reward);
     }
 
-    function updatePool() public {
-
-        uint256 supply = poolInfo.totalDeposit;
-        if (supply == 0) {
-            poolInfo.lastRewardTime = block.timestamp;
-            return;
+    function upgradeTier(uint256 tokenId, uint256 tier) external {
+        OwnerData storage data = ownerData[msg.sender][tokenId];
+        require(data.balance < 5, "Your NFT already in Highest tier");
+        if (tier == 0) {
+            if (data.balance == 2) {
+                IERC20(tokenAddress).transferFrom(msg.sender, address(this),50*10**18);
+                data.rewardPaid = earn(msg.sender, tokenId);
+                data.balance = 5;
+                if (!isClaimed[poolId.current()][tokenId]) {
+                    data.lastUpdate = block.timestamp;
+                    poolInfos[poolId.current()].totalDeposit += 3;
+                    poolInfos[poolId.current()].rewardPerNFT = rewardPerDay.div(poolInfos[poolId.current()].totalDeposit);
+                } else {
+                    poolInfos[poolId.current()].totalDepositForNextPool += 3;
+                }
+            } else {
+                IERC20(tokenAddress).transferFrom(msg.sender, address(this),60*10**18);
+                data.rewardPaid = earn(msg.sender, tokenId);
+                data.balance = 5;
+                if (!isClaimed[poolId.current()][tokenId]) {
+                    data.lastUpdate = block.timestamp;
+                    poolInfos[poolId.current()].totalDeposit += 4;
+                    poolInfos[poolId.current()].rewardPerNFT = rewardPerDay.div(poolInfos[poolId.current()].totalDeposit);
+                } else {
+                    poolInfos[poolId.current()].totalDepositForNextPool += 4;
+                }
+            }
+        } else if (tier == 1) {
+            require(data.balance < 2, "Your NFT already in Rare tier");
+            IERC20(tokenAddress).transferFrom(msg.sender, address(this),10*10**18);
+            data.rewardPaid = earn(msg.sender, tokenId);
+            data.balance = 2;
+            if (!isClaimed[poolId.current()][tokenId]) {
+                data.lastUpdate = block.timestamp;
+                poolInfos[poolId.current()].totalDeposit += 1;
+                poolInfos[poolId.current()].rewardPerNFT = rewardPerDay.div(poolInfos[poolId.current()].totalDeposit);
+            } else {
+                poolInfos[poolId.current()].totalDepositForNextPool += 1;
+            }
         }
 
-        uint256 multiplier = getMultiplier(poolInfo.lastRewardTime, block.timestamp);
-        uint256 tokenReward = rewardPerDay * multiplier;
-        poolInfo.accRewardsPerShare = poolInfo.accRewardsPerShare.add(tokenReward.mul(1e18).div(supply));
-        poolInfo.lastRewardTime = block.timestamp;
     }
 
-    function getOwnerData() external view returns(OwnerData memory) {
-        return ownerData[msg.sender];
+    function createNewPool(uint256 totalDeposit) internal view returns (PoolInfo memory){
+        uint256 rewardPerNFT = rewardPerDay.div(totalDeposit);
+        return PoolInfo(
+            block.timestamp,
+            totalDeposit,
+            totalDeposit,
+            block.timestamp,
+            rewardPerDay,
+            rewardPerNFT
+        );
+    }
+
+    function updatePool(uint256 _poolId) internal {
+        PoolInfo storage pool = poolInfos[_poolId];
+        uint256 multiplier ;
+        if (pool.lastRewardTime > 0) {
+            multiplier = getMultiplier(pool.lastRewardTime, block.timestamp);
+        }
+        console.log("Multiplier", multiplier);
+        if (multiplier >= 1) {
+            PoolInfo memory newPool = createNewPool(pool.totalDepositForNextPool);
+            poolId.increment();
+            poolInfos[poolId.current()] = newPool;
+        } else {
+            pool.lastRewardTime = block.timestamp;
+        }
+    }
+
+    function getOwnerData(uint256 tokenId) external view returns(OwnerData memory) {
+        return ownerData[msg.sender][tokenId];
+    }
+    function blockTime() external view returns(uint256) {
+        return block.timestamp;
     }
 }
