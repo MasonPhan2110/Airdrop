@@ -83,7 +83,14 @@ contract xVik is ERC721, Ownable, ReentrancyGuard {
     */
     function _handleTransfer(address from_, address to_, uint256 id_, bytes memory data_) internal {
         _safeTransfer(from_, to_, id_, data_);
-        airdrop.transferNFT(from_, to_,id_, scarcitiesOfNFT[id_]);
+        if (scarcitiesOfNFT[id_] == 0) {
+            airdrop.transferNFT(from_, to_,id_, 5);
+        } else if (scarcitiesOfNFT[id_] == 1) {
+            airdrop.transferNFT(from_, to_,id_, 2);
+        } else if (scarcitiesOfNFT[id_] == 2) {
+            airdrop.transferNFT(from_, to_,id_, 1);
+        }
+        
     }
 
 

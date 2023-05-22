@@ -35,7 +35,7 @@ describe("Airdrop",()=>{
         await airdropCon.initialize(nftCon.address, tokenCon.address)
 
         // send token to Airdrop Contract
-        await tokenCon.transfer(airdropCon.address, ethers.utils.parseEther("1000000"))
+        await tokenCon.transfer(airdropCon.address, ethers.utils.parseEther("10000000"))
         // set signer to NFT Contract
         await nftCon.setSigner(signer.address)
         // set contract airdrop in NFT
@@ -112,23 +112,15 @@ describe("Airdrop",()=>{
         let poolInfo = await airdropCon.poolInfos(1);
         expect(poolInfo.totalDeposit).to.be.equal(8)
       })
-      it("check pending reward of 3 addresses", async()=>{
-        let pendingReward1 = await airdropCon.connect(address1).pendingReward(1);
-        console.log(pendingReward1);
-        let pendingReward2 = await airdropCon.connect(address2).pendingReward(2);
-        console.log(pendingReward2);
-        let pendingReward3 = await airdropCon.connect(address3).pendingReward(3);
-        console.log(pendingReward3);
-      })
     })
     describe("Claim Airdrop",()=>{
       it("Address 1 claim airdrop in day 1", async() => {
+        // expect(await airdropCon.connect(address1).pendingReward(1)).to.equal(ethers.utils.parseEther("625000"))
         expect(await airdropCon.connect(address1).claimAirdrop(1)).to.be.ok;
+        expect(await tokenCon.balanceOf(address1.address)).to.equal(ethers.utils.parseEther("625000"));
 
       })
       it("Address 1 claim airdrop in day 1 return fail", async() =>{
-        let pendingReward1 = await airdropCon.connect(address1).pendingReward(1);
-        expect(pendingReward1).to.be.equal(0)
         await expect(airdropCon.connect(address1).claimAirdrop(1)).to.be.reverted;
       })
       it("Address 1 transfer NFT to address 2 claim airdrop in day 1 return fail", async() =>{
@@ -137,27 +129,54 @@ describe("Airdrop",()=>{
         await expect(airdropCon.connect(address2).claimAirdrop(1)).to.be.reverted;
       })
       it("Address 2 claim airdrop in day 1", async() => {
+        // expect(await airdropCon.connect(address2).pendingReward(2)).to.equal(ethers.utils.parseEther("250000"))
         expect(await airdropCon.connect(address2).claimAirdrop(2)).to.be.ok;
+        expect(await tokenCon.balanceOf(address2.address)).to.equal(ethers.utils.parseEther("250000"));
       })
 
       it("Address 2 claim airdrop in day 2", async() =>{
         // Set time to next day
         let blocktime = await airdropCon.blockTime();
         let time = blocktime.toNumber() + 86400;
+        console.log(time);
         await ethers.provider.send('evm_setNextBlockTimestamp', [time]); 
         await ethers.provider.send('evm_mine');
 
+        
         expect(await airdropCon.connect(address2).claimAirdrop(1)).to.be.ok;
+        let poolId = await airdropCon.getPoolIdCurrent();
+        console.log("PoolID: ",poolId);
         expect(await airdropCon.connect(address2).claimAirdrop(2)).to.be.ok;
+        expect(await tokenCon.balanceOf(address2.address)).to.equal(ethers.utils.parseEther("1125000"));
       })
       it("Address 3 claim airdrop in day 3", async() =>{
         // Set time to next day
         let blocktime = await airdropCon.blockTime();
         let time = blocktime.toNumber() + 86400;
+        console.log(time);
         await ethers.provider.send('evm_setNextBlockTimestamp', [time]); 
         await ethers.provider.send('evm_mine');
 
         expect(await airdropCon.connect(address3).claimAirdrop(3)).to.be.ok;
+        expect(await tokenCon.balanceOf(address3.address)).to.equal(ethers.utils.parseEther("375000"));
+      })
+      it("Address 2 upgrade tier of NFT and claim airdrop in day 4", async()=>{
+        // Set time to next day
+        let blocktime = await airdropCon.blockTime();
+        let time = blocktime.toNumber() + 86400;
+        console.log(time);
+        await ethers.provider.send('evm_setNextBlockTimestamp', [time]); 
+        await ethers.provider.send('evm_mine');
+        // upgrade tier 
+        // upgrade tier fail because NFT already in Super rare tier
+        await expect(airdropCon.connect(address2).upgradeTier(1,0)).to.be.reverted;
+        // upgrade tier succeed
+        await tokenCon.connect(address2).approve(airdropCon.address, ethers.utils.parseEther("50"))
+        expect(await airdropCon.connect(address2).upgradeTier(2,0)).to.be.ok;
+        console.log(await tokenCon.balanceOf(address2.address))
+        // claim airdrop
+        expect(await airdropCon.connect(address2).claimAirdrop(2)).to.be.ok;
+        expect(await tokenCon.balanceOf(address2.address)).to.equal(ethers.utils.parseEther("1624950"));
       })
     })
 })
