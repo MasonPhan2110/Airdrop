@@ -4,7 +4,7 @@ A Project that allow claim airdrop.
 
 ## Demo website
 
--
+- Website: https://airdrop-web-blush.vercel.app/
 - Token address on BSCTestnet : 0xcbF26e3835A95748AB360BbdE8F4Fe4c1Be115c5
 - NFT address on BSCTestnet : 0x2c6CFe642d982f21B1146a8F0613CA8374fF63B8
 - Airdrop address on BSCTestnet : 0x297f7F2C68Bf197b748AC65E3C89d05849D2fc8f
@@ -38,6 +38,7 @@ Verify contract on BscScan:
 ## Interactive scripts
 
 To generate Signature for mint NFT, run `node scripts/interact/getSignature.js` (change the data inside `getSignature` to get the right signature)
+To approve Allowance, run `npm run approve:Token bscTestnet` (change the data inside `approveAllowance` to approve right amount)
 
 ### Environment
 
