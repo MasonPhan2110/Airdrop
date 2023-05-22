@@ -65,6 +65,8 @@ contract Airdrop is OwnableUpgradeable, UUPSUpgradeable {
         rewardPerDay = 1_000_000 * 10**18;
         tokenAddress = token_;
         poolId._value = 1;
+        poolInfos[poolId.current()].createTime = block.timestamp;
+        poolInfos[poolId.current()].rewardRemain = rewardPerDay;
         ///@dev as there is no constructor, we need to initialise the OwnableUpgradeable explicitly
         __Ownable_init();
 
@@ -140,12 +142,17 @@ contract Airdrop is OwnableUpgradeable, UUPSUpgradeable {
         uint256 time = block.timestamp/DAY_IN_SECONDS - data.lastClaimed/DAY_IN_SECONDS;
         require(time >=1, "You already Claimed");
 
+        uint256 _poolId = poolId.current();
         updatePool(poolId.current());
+        if (_poolId != poolId.current()) {
+            pool = poolInfos[poolId.current()];
+        }
         require(claimInfo[poolId.current()][tokenId].claimTime == 0,"This token already claimed airdrop");
         uint256 reward = earn(msg.sender, tokenId);
         if (pool.rewardRemain == 0 && time == 1) {
             reward = 0;
         }
+        pool.rewardRemain = pool.rewardRemain.sub(pool.rewardPerNFT.mul(data.balance));
         if(reward > 0) {
             uint256 bal = IERC20(tokenAddress).balanceOf(address(this));
             require(bal>=reward,"InsufficentFund");

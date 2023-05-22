@@ -73,6 +73,7 @@ describe("Airdrop",()=>{
         // Check Pool Info
         let poolInfo = await airdropCon.poolInfos(1);
         expect(poolInfo.totalDeposit).to.be.equal(5)
+        
       })
       it("Mint NFT succeed for address 2", async()=>{
         const hashMessage = await Web3.utils.soliditySha3(
@@ -115,6 +116,7 @@ describe("Airdrop",()=>{
     })
     describe("Claim Airdrop",()=>{
       it("Address 1 claim airdrop in day 1", async() => {
+        
         // expect(await airdropCon.connect(address1).pendingReward(1)).to.equal(ethers.utils.parseEther("625000"))
         expect(await airdropCon.connect(address1).claimAirdrop(1)).to.be.ok;
         expect(await tokenCon.balanceOf(address1.address)).to.equal(ethers.utils.parseEther("625000"));
@@ -135,6 +137,7 @@ describe("Airdrop",()=>{
       })
 
       it("Address 2 claim airdrop in day 2", async() =>{
+        
         // Set time to next day
         let blocktime = await airdropCon.blockTime();
         let time = blocktime.toNumber() + 86400;
@@ -144,6 +147,7 @@ describe("Airdrop",()=>{
 
         
         expect(await airdropCon.connect(address2).claimAirdrop(1)).to.be.ok;
+        
         let poolId = await airdropCon.getPoolIdCurrent();
         console.log("PoolID: ",poolId);
         expect(await airdropCon.connect(address2).claimAirdrop(2)).to.be.ok;

@@ -5,7 +5,7 @@ const fs = require("fs");
 // Define the NFT
 
 async function main() {
-    const contract_sol_url = "contracts/Collections/Vik.sol:Vik";
+    const contract_sol_url = "contracts/Token/Vik.sol:Vik";
     const file = fs.readFileSync(
       "./scripts/data/deployToken.json",
       "utf8"

@@ -30,7 +30,7 @@ async function main() {
 });
  await airdrop.deployed();
 
- console.log("Airdrop Proxy deployed to:", geomark.address);
+ console.log("Airdrop Proxy deployed to:", airdrop.address);
 
  fs.writeFileSync(
     "./scripts/data/deployAirdropProxy.json",

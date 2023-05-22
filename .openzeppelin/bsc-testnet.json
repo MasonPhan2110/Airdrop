@@ -1,0 +1,635 @@
+{
+  "manifestVersion": "3.2",
+  "proxies": [
+    {
+      "address": "0x160A85E3ccA4B37532231295a74e58678CdFBB63",
+      "txHash": "0xdcbd94afe02f7bc5c30360ad099b4b8b4e112f2c6bdcdfa1b935d8ebba63dc67",
+      "kind": "uups"
+    },
+    {
+      "address": "0x43A28003bC20868649963b3880d92E4bC671F4c6",
+      "txHash": "0x1b0f7bac8fe6770068ce7a082ba5da5730a9f8b964027e100252ac89e66e098a",
+      "kind": "uups"
+    },
+    {
+      "address": "0x18a1c4D9242bc171700f06AdE4C2a72090bF9CD7",
+      "txHash": "0x466655d80d06cf6a32dea0b7b8189feac20cf2f6f24f141b30c1d1cc70c2000d",
+      "kind": "uups"
+    },
+    {
+      "address": "0x297f7F2C68Bf197b748AC65E3C89d05849D2fc8f",
+      "txHash": "0x609e4459b2ba5a1fe48f8059d8157d4170c18dfa9192b97d1337e67e02923dd1",
+      "kind": "uups"
+    }
+  ],
+  "impls": {
+    "52e870817164d6f5bd7d3cd4b53d9d4ccc140c60094077032e08a2cb333e4514": {
+      "address": "0x9683e32A0aBf739c8c5Ec3f37b6dff4F4958ce6d",
+      "txHash": "0x85bae6270b5c2223b4eb4c1cc0bd8297ca63a6abaef33b629337971850d017e1",
+      "layout": {
+        "solcVersion": "0.8.7",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ERC1967UpgradeUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol:197"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "UUPSUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol:107"
+          },
+          {
+            "label": "poolId",
+            "offset": 0,
+            "slot": "201",
+            "type": "t_struct(Counter)1302_storage",
+            "contract": "Airdrop",
+            "src": "contracts/Airdrop.sol:15"
+          },
+          {
+            "label": "rewardPerDay",
+            "offset": 0,
+            "slot": "202",
+            "type": "t_uint256",
+            "contract": "Airdrop",
+            "src": "contracts/Airdrop.sol:17"
+          },
+          {
+            "label": "_nftContract",
+            "offset": 0,
+            "slot": "203",
+            "type": "t_address",
+            "contract": "Airdrop",
+            "src": "contracts/Airdrop.sol:18"
+          },
+          {
+            "label": "ownerData",
+            "offset": 0,
+            "slot": "204",
+            "type": "t_mapping(t_address,t_mapping(t_uint256,t_struct(OwnerData)1748_storage))",
+            "contract": "Airdrop",
+            "src": "contracts/Airdrop.sol:19"
+          },
+          {
+            "label": "poolInfos",
+            "offset": 0,
+            "slot": "205",
+            "type": "t_mapping(t_uint256,t_struct(PoolInfo)1761_storage)",
+            "contract": "Airdrop",
+            "src": "contracts/Airdrop.sol:20"
+          },
+          {
+            "label": "claimInfo",
+            "offset": 0,
+            "slot": "206",
+            "type": "t_mapping(t_uint256,t_mapping(t_uint256,t_struct(ClaimInfo)1768_storage))",
+            "contract": "Airdrop",
+            "src": "contracts/Airdrop.sol:21"
+          },
+          {
+            "label": "holder",
+            "offset": 0,
+            "slot": "207",
+            "type": "t_uint256",
+            "contract": "Airdrop",
+            "src": "contracts/Airdrop.sol:22"
+          },
+          {
+            "label": "startDay",
+            "offset": 0,
+            "slot": "208",
+            "type": "t_uint256",
+            "contract": "Airdrop",
+            "src": "contracts/Airdrop.sol:23"
+          },
+          {
+            "label": "tokenAddress",
+            "offset": 0,
+            "slot": "209",
+            "type": "t_address",
+            "contract": "Airdrop",
+            "src": "contracts/Airdrop.sol:24"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_mapping(t_uint256,t_struct(OwnerData)1748_storage))": {
+            "label": "mapping(address => mapping(uint256 => struct Airdrop.OwnerData))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_mapping(t_uint256,t_struct(ClaimInfo)1768_storage))": {
+            "label": "mapping(uint256 => mapping(uint256 => struct Airdrop.ClaimInfo))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(ClaimInfo)1768_storage)": {
+            "label": "mapping(uint256 => struct Airdrop.ClaimInfo)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(OwnerData)1748_storage)": {
+            "label": "mapping(uint256 => struct Airdrop.OwnerData)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(PoolInfo)1761_storage)": {
+            "label": "mapping(uint256 => struct Airdrop.PoolInfo)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(ClaimInfo)1768_storage": {
+            "label": "struct Airdrop.ClaimInfo",
+            "members": [
+              {
+                "label": "claimTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "reward",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "user",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "2"
+              }
+            ],
+            "numberOfBytes": "96"
+          },
+          "t_struct(Counter)1302_storage": {
+            "label": "struct Counters.Counter",
+            "members": [
+              {
+                "label": "_value",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(OwnerData)1748_storage": {
+            "label": "struct Airdrop.OwnerData",
+            "members": [
+              {
+                "label": "startTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "balance",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "rewardClaimed",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "lastClaimed",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "lastUpdate",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "rewardPaid",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "5"
+              }
+            ],
+            "numberOfBytes": "192"
+          },
+          "t_struct(PoolInfo)1761_storage": {
+            "label": "struct Airdrop.PoolInfo",
+            "members": [
+              {
+                "label": "createTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "totalDeposit",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "totalDepositForNextPool",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "lastRewardTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "rewardRemain",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "rewardPerNFT",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "5"
+              }
+            ],
+            "numberOfBytes": "192"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "e8ff65dd944289eec32a7803c68e45a3ab859f46d6b30d197b31f1f3a4f1dfb9": {
+      "address": "0xD708Def438313A0A4Ebd92e1B01204351B4D4960",
+      "txHash": "0x1d652dcbd735ede07a4b5bef047f4a5d368d2b9ab617e76c9b7c4f51ae4fb6a6",
+      "layout": {
+        "solcVersion": "0.8.7",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ERC1967UpgradeUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol:197"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "UUPSUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol:107"
+          },
+          {
+            "label": "poolId",
+            "offset": 0,
+            "slot": "201",
+            "type": "t_struct(Counter)1302_storage",
+            "contract": "Airdrop",
+            "src": "contracts/Airdrop.sol:15"
+          },
+          {
+            "label": "rewardPerDay",
+            "offset": 0,
+            "slot": "202",
+            "type": "t_uint256",
+            "contract": "Airdrop",
+            "src": "contracts/Airdrop.sol:17"
+          },
+          {
+            "label": "_nftContract",
+            "offset": 0,
+            "slot": "203",
+            "type": "t_address",
+            "contract": "Airdrop",
+            "src": "contracts/Airdrop.sol:18"
+          },
+          {
+            "label": "ownerData",
+            "offset": 0,
+            "slot": "204",
+            "type": "t_mapping(t_address,t_mapping(t_uint256,t_struct(OwnerData)1748_storage))",
+            "contract": "Airdrop",
+            "src": "contracts/Airdrop.sol:19"
+          },
+          {
+            "label": "poolInfos",
+            "offset": 0,
+            "slot": "205",
+            "type": "t_mapping(t_uint256,t_struct(PoolInfo)1761_storage)",
+            "contract": "Airdrop",
+            "src": "contracts/Airdrop.sol:20"
+          },
+          {
+            "label": "claimInfo",
+            "offset": 0,
+            "slot": "206",
+            "type": "t_mapping(t_uint256,t_mapping(t_uint256,t_struct(ClaimInfo)1768_storage))",
+            "contract": "Airdrop",
+            "src": "contracts/Airdrop.sol:21"
+          },
+          {
+            "label": "holder",
+            "offset": 0,
+            "slot": "207",
+            "type": "t_uint256",
+            "contract": "Airdrop",
+            "src": "contracts/Airdrop.sol:22"
+          },
+          {
+            "label": "startDay",
+            "offset": 0,
+            "slot": "208",
+            "type": "t_uint256",
+            "contract": "Airdrop",
+            "src": "contracts/Airdrop.sol:23"
+          },
+          {
+            "label": "tokenAddress",
+            "offset": 0,
+            "slot": "209",
+            "type": "t_address",
+            "contract": "Airdrop",
+            "src": "contracts/Airdrop.sol:24"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_mapping(t_uint256,t_struct(OwnerData)1748_storage))": {
+            "label": "mapping(address => mapping(uint256 => struct Airdrop.OwnerData))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_mapping(t_uint256,t_struct(ClaimInfo)1768_storage))": {
+            "label": "mapping(uint256 => mapping(uint256 => struct Airdrop.ClaimInfo))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(ClaimInfo)1768_storage)": {
+            "label": "mapping(uint256 => struct Airdrop.ClaimInfo)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(OwnerData)1748_storage)": {
+            "label": "mapping(uint256 => struct Airdrop.OwnerData)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(PoolInfo)1761_storage)": {
+            "label": "mapping(uint256 => struct Airdrop.PoolInfo)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(ClaimInfo)1768_storage": {
+            "label": "struct Airdrop.ClaimInfo",
+            "members": [
+              {
+                "label": "claimTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "reward",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "user",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "2"
+              }
+            ],
+            "numberOfBytes": "96"
+          },
+          "t_struct(Counter)1302_storage": {
+            "label": "struct Counters.Counter",
+            "members": [
+              {
+                "label": "_value",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(OwnerData)1748_storage": {
+            "label": "struct Airdrop.OwnerData",
+            "members": [
+              {
+                "label": "startTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "balance",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "rewardClaimed",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "lastClaimed",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "lastUpdate",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "rewardPaid",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "5"
+              }
+            ],
+            "numberOfBytes": "192"
+          },
+          "t_struct(PoolInfo)1761_storage": {
+            "label": "struct Airdrop.PoolInfo",
+            "members": [
+              {
+                "label": "createTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "totalDeposit",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "totalDepositForNextPool",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "lastRewardTime",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "rewardRemain",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "rewardPerNFT",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "5"
+              }
+            ],
+            "numberOfBytes": "192"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    }
+  }
+}
