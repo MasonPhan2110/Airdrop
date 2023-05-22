@@ -1,4 +1,4 @@
-# SOLANA SWAP CONTRACT
+# CLAIM AIRDROP CONTRACT
 
 A Project that allow claim airdrop.
 
